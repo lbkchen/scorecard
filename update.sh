@@ -4,7 +4,7 @@
 ps -ef | grep "scorecard.py" | awk '{print $2}' | xargs sudo kill
 
 # Re-pull repo
-cd /home/home/pi/Dev/scorecard || exit
+cd /home/pi/Dev/scorecard || exit
 git pull origin master
 
 # Start running script again

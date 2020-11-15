@@ -106,22 +106,6 @@ def get_youtube_subscribers():
     return response['items'][0]['statistics']['subscriberCount']
 
 
-# Fitbit requires OAuth2 so we are not doing it for now
-
-# def get_fitbit_steps():
-#     fitbit.gather_keys_oauth2
-#     server = Oauth2.OAuth2Server(FITBIT_CLIENT_ID, FITBIT_CLIENT_SECRET)
-#     server.browser_authorize()
-
-#     ACCESS_TOKEN = str(server.fitbit.client.session.token['access_token'])
-#     REFRESH_TOKEN = str(server.fitbit.client.session.token['refresh_token'])
-
-#     client = fitbit.Fitbit(FITBIT_CLIENT_ID, FITBIT_CLIENT_SECRET, oauth2=True,
-#                            access_token=ACCESS_TOKEN, refresh_token=REFRESH_TOKEN)
-#     steps_stats = client.time_series("activities")
-#     print(steps_stats)
-
-
 def main():
     img = Image.new("P", (W, H), color=WHITE)
     draw = ImageDraw.Draw(img)

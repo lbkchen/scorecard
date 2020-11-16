@@ -18,6 +18,9 @@ DOSIS_BOLD_PATH = "fonts/dosis/Dosis-Bold.ttf"
 GH_IMAGE_PATH = "img/GitHub-Mark-64px.png"
 YT_IMAGE_PATH = "img/play-button-red-48.png"
 USER_IMAGE_PATH = "img/user-52.png"
+ILLUMINATI_IMAGE_PATH = "img/illuminati-100.png"
+ILLUMINATI_WHITE_IMAGE_PATH = "img/illuminati-white-100.png"
+EYE_WHITE_IMAGE_PATH = "img/eye-white-48.png"
 
 W = 400
 H = 300
@@ -99,7 +102,7 @@ def get_num_contributions_today(username):
     return num_contributions
 
 
-def get_youtube_subscribers():
+def get_youtube_stats():
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
     request = youtube.channels().list(
         part="statistics",
@@ -107,7 +110,7 @@ def get_youtube_subscribers():
     )
     response = request.execute()
     print(response)
-    return response['items'][0]['statistics']['subscriberCount']
+    return response['items'][0]['statistics']
 
 
 def main():
@@ -140,9 +143,9 @@ def main():
     # draw.text(left_num_c, "{n}".format(n=num_contributions),
     #           fill=BLACK, font=dosis_font_bold_md, anchor="mm")
 
-    # Get YouTube
-    num_subscribers = get_youtube_subscribers()
-    print(num_subscribers)
+    # Get subs
+    youtube_stats = get_youtube_stats()
+    num_subscribers = youtube_stats["subscriberCount"]
     subscribers_c = (W/2, H/2)
     num_subscribers = "{n}".format(n=num_subscribers)
     draw.text(subscribers_c, num_subscribers,
@@ -156,6 +159,23 @@ def main():
     user_icon_x = int(W/2 - num_subscribers_size[0]/2 - icon_padding - icon_w)
     user_icon_y = int(H/2 - icon_w/2)
     img.paste(user_img, box=(user_icon_x, user_icon_y), mask=user_img)
+
+    # Get view count
+    num_views = youtube_stats["viewCount"]
+    num_views = "{n}".format(n=num_views)
+    num_views_y = int(5/6 * H)
+    num_views_c = (W/2, num_views_y)
+    draw.text(num_views_c, num_views, fill=WHITE,
+              font=dosis_font_bold_md, anchor="mm")
+    num_views_size = dosis_font_bold_md.getsize(num_views)
+
+    icon_w = 25
+    icon_padding = 10
+    eye_img = Image.open(EYE_WHITE_IMAGE_PATH)
+    eye_img = eye_img.resize((icon_w, icon_w))
+    eye_icon_x = int(W/2 - num_views_size[0]/2 - icon_padding - icon_w)
+    eye_icon_y = int(num_views_y - icon_w/2)
+    img.paste(eye_img, box=(eye_icon_x, eye_icon_y), mask=eye_img)
 
     # Preview image
     img.show()

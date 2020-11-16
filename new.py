@@ -12,6 +12,11 @@ from dotenv import load_dotenv
 from datetime import datetime
 from googleapiclient.discovery import build
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--simulate', '-s', required=False,
+                    action='store_true', help="Simulate Inky on Mac")
+args = parser.parse_args()
+print(args)
 
 DOSIS_REGULAR_PATH = "fonts/dosis/Dosis-Regular.ttf"
 DOSIS_BOLD_PATH = "fonts/dosis/Dosis-Bold.ttf"
@@ -53,6 +58,16 @@ FITBIT_CLIENT_ID = os.getenv("FITBIT_CLIENT_ID")
 FITBIT_CLIENT_SECRET = os.getenv("FITBIT_CLIENT_SECRET")
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+
+
+# Handle Inky libraries
+if not args.simulate:
+    from inky import InkyWHAT
+    from inky.auto import auto
+    inky_display = auto()
+    RED = inky_display.RED
+    BLACK = inky_display.BLACK
+    WHITE = inky_display.WHITE
 
 
 def get_num_contributions_today(username):
@@ -118,8 +133,8 @@ def main():
     draw = ImageDraw.Draw(img)
 
     # Draw stripes
-    draw.rectangle([TOP_LEFT_C, (W, H/8)], fill="red")
-    draw.rectangle([(0, 2*H/3), BOT_RIGHT_C], fill="red")
+    draw.rectangle([TOP_LEFT_C, (W, H/8)], fill=RED)
+    draw.rectangle([(0, 2*H/3), BOT_RIGHT_C], fill=RED)
 
     # Put channel name and YT icon
     title_row_y = int(2*H/7)
@@ -178,7 +193,11 @@ def main():
     img.paste(eye_img, box=(eye_icon_x, eye_icon_y), mask=eye_img)
 
     # Preview image
-    img.show()
+    if args.simulate:
+        img.show()
+    else:
+        inky_display.set_image(img)
+        inky_display.show()
 
 
 if __name__ == "__main__":

@@ -61,10 +61,10 @@ YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 
 # Handle Inky libraries
+inky_display = None
 if not args.simulate:
     from inky import InkyWHAT
-    from inky.auto import auto
-    inky_display = auto()
+    inky_display = InkyWHAT("red")
     RED = inky_display.RED
     BLACK = inky_display.BLACK
     WHITE = inky_display.WHITE

@@ -129,7 +129,7 @@ def get_youtube_stats():
 
 
 def main():
-    img = Image.new("RGBA", (W, H), color=WHITE)
+    img = Image.new("P", (W, H), color=WHITE)
     draw = ImageDraw.Draw(img)
 
     # Draw stripes

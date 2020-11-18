@@ -16,7 +16,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--simulate', '-s', required=False,
                     action='store_true', help="Simulate Inky on Mac")
 args = parser.parse_args()
-print(args)
 
 DOSIS_REGULAR_PATH = "fonts/dosis/Dosis-Regular.ttf"
 DOSIS_BOLD_PATH = "fonts/dosis/Dosis-Bold.ttf"
@@ -68,6 +67,8 @@ if not args.simulate:
     RED = inky_display.RED
     BLACK = inky_display.BLACK
     WHITE = inky_display.WHITE
+    W = inky_display.WIDTH
+    H = inky_display.HEIGHT
 
 
 def get_num_contributions_today(username):
@@ -131,6 +132,7 @@ def get_youtube_stats():
 def main():
     img = Image.new("P", (W, H), color=WHITE)
     draw = ImageDraw.Draw(img)
+    print("-- Initialized Image (W: {w}, H: {h}) --".format(w=W, h=H))
 
     # Draw stripes
     draw.rectangle([TOP_LEFT_C, (W, H/8)], fill=RED)
@@ -194,8 +196,10 @@ def main():
 
     # Preview image
     if args.simulate:
+        print("-- Showing simulated image now --")
         img.show()
     else:
+        print("-- Showing image on inky display now --")
         inky_display.set_image(img)
         inky_display.show()
 

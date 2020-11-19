@@ -10,6 +10,10 @@ git pull origin master
 # Install dependencies
 # TODO: Get pipenv working again?
 sudo apt-get install libopenjp2-7
+# pip3 install google-api-python-client
+# pip3 install PyGithub
+# pip3 install python-dotenv
+# pip3 install Pillow
 
 # Start running script again
 python3 new.py

@@ -58,6 +58,8 @@ FITBIT_CLIENT_SECRET = os.getenv("FITBIT_CLIENT_SECRET")
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
+YOUTUBE_CHANNEL_ID = "UCO1_BGGMvhw0ehsSBYwSbig"
+
 
 # Handle Inky libraries
 inky_display = None
@@ -122,17 +124,43 @@ def get_youtube_stats():
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
     request = youtube.channels().list(
         part="statistics",
-        id="UCO1_BGGMvhw0ehsSBYwSbig"
+        id=YOUTUBE_CHANNEL_ID
     )
     response = request.execute()
-    print(response)
+    # print(response)
+
+    comments = youtube.commentThreads().list(
+        part="snippet,replies",
+        allThreadsRelatedToChannelId=YOUTUBE_CHANNEL_ID
+    ).execute()["items"]
+    # print("comments", comments)
+
+    top_comment = max(
+        comments,
+        key=get_youtube_comment_score
+    )
+    print("top comment", top_comment)
+
     return response['items'][0]['statistics']
 
 
-def main():
+def get_youtube_comment_score(comment):
+    try:
+        likes = comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+    except KeyError:
+        return -1
+    return likes
+
+
+def init_image():
     img = Image.new("P", (W, H), color=WHITE)
     draw = ImageDraw.Draw(img)
     print("-- Initialized Image (W: {w}, H: {h}) --".format(w=W, h=H))
+    return img, draw
+
+
+def draw_old():
+    img, draw = init_image()
 
     # Draw stripes
     draw.rectangle([TOP_LEFT_C, (W, H/8)], fill=RED)
@@ -194,6 +222,18 @@ def main():
     eye_icon_y = int(num_views_y - icon_w/2)
     img.paste(eye_img, box=(eye_icon_x, eye_icon_y), mask=eye_img)
 
+    return img
+
+
+def draw():
+    img, draw = init_image()
+    draw.rectangle([TOP_LEFT_C, (W, H/2-10)], fill=BLACK)
+    draw.rectangle([BOT_LEFT_C, (W, H/2+10)], fill=BLACK)
+
+    return img
+
+
+def set_inky_display(img):
     # Preview image
     if args.simulate:
         print("-- Showing simulated image now --")
@@ -202,6 +242,11 @@ def main():
         print("-- Showing image on inky display now --")
         inky_display.set_image(img)
         inky_display.show()
+
+
+def main():
+    img = draw()
+    set_inky_display(img)
 
 
 if __name__ == "__main__":

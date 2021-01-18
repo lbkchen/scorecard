@@ -65,7 +65,7 @@ YOUTUBE_CHANNEL_ID = "UCO1_BGGMvhw0ehsSBYwSbig"
 inky_display = None
 if not args.simulate:
     from inky import InkyWHAT
-    inky_display = InkyWHAT("red")
+    inky_display = InkyWHAT("black")
     RED = inky_display.RED
     BLACK = inky_display.BLACK
     WHITE = inky_display.WHITE

@@ -21,6 +21,7 @@ DOSIS_REGULAR_PATH = "fonts/dosis/Dosis-Regular.ttf"
 DOSIS_BOLD_PATH = "fonts/dosis/Dosis-Bold.ttf"
 GH_IMAGE_PATH = "img/GitHub-Mark-64px.png"
 YT_IMAGE_PATH = "img/play-button-red-48.png"
+YT_BLACK_IMAGE_PATH = "img/play-button-50.png"
 USER_IMAGE_PATH = "img/user-52.png"
 ILLUMINATI_IMAGE_PATH = "img/illuminati-100.png"
 ILLUMINATI_WHITE_IMAGE_PATH = "img/illuminati-white-100.png"
@@ -121,27 +122,35 @@ def get_num_contributions_today(username):
 
 
 def get_youtube_stats():
+    """
+    Gets channel stats. 
+    """
     youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
     request = youtube.channels().list(
         part="statistics",
         id=YOUTUBE_CHANNEL_ID
     )
     response = request.execute()
-    # print(response)
 
+    return response['items'][0]['statistics']
+
+
+def get_youtube_top_recent_commment():
+    """
+    Gets top comment by like count from recent 100(?) comments for the channel. 
+    """
+    youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
     comments = youtube.commentThreads().list(
         part="snippet,replies",
         allThreadsRelatedToChannelId=YOUTUBE_CHANNEL_ID
     ).execute()["items"]
-    # print("comments", comments)
 
     top_comment = max(
         comments,
         key=get_youtube_comment_score
     )
     print("top comment", top_comment)
-
-    return response['items'][0]['statistics']
+    return top_comment
 
 
 def get_youtube_comment_score(comment):
@@ -150,6 +159,29 @@ def get_youtube_comment_score(comment):
     except KeyError:
         return -1
     return likes
+
+
+# Drawing helpers
+
+def reflow_quote(quote, width, font):
+    words = quote.split(" ")
+    reflowed = '"'
+    line_length = 0
+
+    for i in range(len(words)):
+        word = words[i] + " "
+        word_length = font.getsize(word)[0]
+        line_length += word_length
+
+        if line_length < width:
+            reflowed += word
+        else:
+            line_length = word_length
+            reflowed = reflowed[:-1] + "\n  " + word
+
+    reflowed = reflowed.rstrip() + '"'
+
+    return reflowed
 
 
 def init_image():
@@ -227,8 +259,55 @@ def draw_old():
 
 def draw():
     img, draw = init_image()
-    draw.rectangle([TOP_LEFT_C, (W, H/2-10)], fill=BLACK)
-    draw.rectangle([BOT_LEFT_C, (W, H/2+10)], fill=BLACK)
+    # draw.rectangle([TOP_LEFT_C, (W, H/2-10)], fill=BLACK)
+    # draw.rectangle([BOT_LEFT_C, (W, H/2+10)], fill=BLACK)
+
+    # Draw logo
+    icon_w = 50
+    icon_padding = 6
+    yt_img = Image.open(YT_BLACK_IMAGE_PATH)
+    yt_img = yt_img.resize((icon_w, icon_w))
+    img.paste(yt_img, box=(icon_padding, icon_padding), mask=yt_img)
+
+    # Get subscribers
+    youtube_stats = get_youtube_stats()
+    num_subscribers = youtube_stats["subscriberCount"]
+    num_subscribers = "{n}".format(n=num_subscribers)
+    draw.text((icon_w + icon_padding*2, icon_w/2 + icon_padding), num_subscribers,
+              fill=BLACK, font=dosis_font_bold_md, anchor="lm")
+    # num_subscribers_size = dosis_font_bold_lg.getsize(num_subscribers)
+
+    # Draw top comment frame
+    footer_h = 40
+    frame_edge_padding = 10
+    frame_top_y = icon_w + icon_padding*2
+    frame_bottom_y = H - footer_h - frame_edge_padding
+
+    draw.rectangle([(frame_edge_padding, frame_top_y),
+                    (W - frame_edge_padding, frame_bottom_y)], fill=BLACK)
+
+    # Get YT top comment
+    comment = comment = get_youtube_top_recent_commment()
+    try:
+        quote = comment["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+        author = comment["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"]
+    except KeyError:
+        quote = "Failed lol"
+        author = "pleb"
+
+    quote_padding = 20
+    quote_font = dosis_font_bold_sm
+
+    quote = "kelsey when is the mixtape dropping lol this is so funny and reflowed lol so funny and reflowed lol"
+    reflowed_quote = reflow_quote(quote, W - quote_padding, quote_font)
+    draw.multiline_text((quote_padding/2, H/3), reflowed_quote,
+                        fill=WHITE, font=quote_font, align="left")
+
+    # Draw author
+    footer_padding = 6
+
+    draw.text((W - footer_padding, H - footer_padding), f"-{author}",
+              fill=BLACK, font=dosis_font_bold_sm, anchor="rd")
 
     return img
 

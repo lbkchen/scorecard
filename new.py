@@ -154,8 +154,18 @@ def get_youtube_top_recent_commment():
 
 
 def get_youtube_comment_score(comment):
+    likes = -1
     try:
-        likes = comment["snippet"]["topLevelComment"]["snippet"]["likeCount"]
+        snippet = comment["snippet"]["topLevelComment"]["snippet"]
+        published_at = snippet["publishedAt"]
+        published_at = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ")
+
+        # Exponential decay score by published date
+        print("delta", datetime.now() - published_at)
+        delta_weeks = (datetime.now() - published_at).days / 7
+        likes = snippet["likeCount"]
+        factor = 0.5
+        likes *= (factor ** (delta_weeks))
     except KeyError:
         return -1
     return likes

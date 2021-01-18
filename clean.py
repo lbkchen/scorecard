@@ -4,7 +4,7 @@
 import argparse
 import time
 
-from inky.auto import auto
+from inky import InkyWHAT
 from PIL import Image
 
 print("""Inky pHAT: Clean
@@ -14,7 +14,7 @@ display of any ghosting.
 
 """)
 
-inky_display = auto(ask_user=True, verbose=True)
+inky_display = InkyWHAT("black")
 
 # Command line arguments to determine number of cycles to run
 parser = argparse.ArgumentParser()

@@ -259,8 +259,6 @@ def draw_old():
 
 def draw():
     img, draw = init_image()
-    # draw.rectangle([TOP_LEFT_C, (W, H/2-10)], fill=BLACK)
-    # draw.rectangle([BOT_LEFT_C, (W, H/2+10)], fill=BLACK)
 
     # Draw logo
     icon_w = 50
@@ -275,10 +273,9 @@ def draw():
     num_subscribers = "{n}".format(n=num_subscribers)
     draw.text((icon_w + icon_padding*2, icon_w/2 + icon_padding), num_subscribers,
               fill=BLACK, font=dosis_font_bold_md, anchor="lm")
-    # num_subscribers_size = dosis_font_bold_lg.getsize(num_subscribers)
 
     # Draw top comment frame
-    footer_h = 40
+    footer_h = 36
     frame_edge_padding = 10
     frame_top_y = icon_w + icon_padding*2
     frame_bottom_y = H - footer_h - frame_edge_padding
@@ -295,17 +292,22 @@ def draw():
         quote = "Failed lol"
         author = "pleb"
 
-    quote_padding = 20
+    quote_padding = 15
     quote_font = dosis_font_bold_sm
 
-    quote = "kelsey when is the mixtape dropping lol this is so funny and reflowed lol so funny and reflowed lol"
-    reflowed_quote = reflow_quote(quote, W - quote_padding, quote_font)
-    draw.multiline_text((quote_padding/2, H/3), reflowed_quote,
+    # Check overflow
+    # quote = "kelsey when is the mixtape dropping lol this is so funny and reflowed lol so funny and reflowed lol reflowed lol so funny and reflowed lol"
+    reflowed_quote = reflow_quote(quote, W - quote_padding*2, quote_font)
+    if reflowed_quote.count("\n") + 1 > 5:  # Hard coded line count
+        reflowed_quote = "\n".join(reflowed_quote.split("\n")[:5])
+        reflowed_quote = " ".join(reflowed_quote.split(" ")[:-1]) + '..."'
+
+    # Draw quote
+    draw.multiline_text((quote_padding, frame_top_y + 2), reflowed_quote,
                         fill=WHITE, font=quote_font, align="left")
 
     # Draw author
     footer_padding = 6
-
     draw.text((W - footer_padding, H - footer_padding), f"-{author}",
               fill=BLACK, font=dosis_font_bold_sm, anchor="rd")
 
